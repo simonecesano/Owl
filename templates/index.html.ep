@@ -1,0 +1,15 @@
+% layout 'default';
+% title 'Welcome';
+ <div class="container">
+      <div class="row">
+        <div class="col-xs-6">
+%= form_for login => (method => 'POST') => begin
+%= formgroup 'Base address', text_field => ['url'], large, cols => { small => [3, 9] }
+%= formgroup 'Domain', text_field => ['domain'], large, cols => { small => [3, 9] }
+%= formgroup 'User', text_field => ['euser'], large, cols => { small => [3, 9] }
+%= formgroup 'Password', password_field => ['passwd'], large, cols => { small => [3, 9] }
+%= submit_button 'login'
+% end
+	</div>
+      </div>
+ </div>

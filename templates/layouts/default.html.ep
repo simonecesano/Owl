@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    %= asset "bootstrap.css"
+    %= asset "bootstrap.js"
+  </head>
+  <body><%= content %></body>
+</html>
