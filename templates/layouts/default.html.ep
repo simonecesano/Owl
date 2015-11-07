@@ -2,8 +2,11 @@
 <html>
   <head>
     <title><%= title %></title>
-    %= asset "bootstrap.css"
-    %= asset "bootstrap.js"
+    %= javascript 'https://code.jquery.com/jquery-2.1.4.min.js'
+    %= javascript 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'
+    %= stylesheet '/css/bootstrap.min.css'
+    %= stylesheet 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.css'
+    <link href="/favicon.ico?v=7" rel="icon" type="image/x-icon" /> 
   </head>
   <body><%= content %></body>
 </html>
