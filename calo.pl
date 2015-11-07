@@ -14,7 +14,7 @@ use DateTime::Format::ICal;
 use DateTime::Format::Strptime;
 
 use Net::Google::Calendar;
-use XML::Simple; # qw(:strict); $XML::Simple::PREFERRED_PARSER = "XML::Parser";
+use XML::Simple; $XML::Simple::PREFERRED_PARSER = "XML::Parser";
 use CHI;
 use Path::Tiny;
 use Morg::UserAgent::LWP::NTLM;
