@@ -86,8 +86,9 @@ any "/g/auth" => sub {
 		     my ($delay, $err, $token) = @_;
 		     return $c->render(text => $err) unless $token;
 		     $c->session(token => $token);
-		     app->log->info("Token: " . dump $token);
+		     app->log->info("Token:\n" . dump $token);
 		     $c->redirect_to('/g/calendars');
+		     app->log->info("Token from session:\n" . dump $token);
 		 },
 		);
 };
