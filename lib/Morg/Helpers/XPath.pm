@@ -2,7 +2,7 @@ package Morg::Helpers::XPath;
 use base 'Mojolicious::Plugin';
 
 use XML::LibXML;
-use XML::Simple;
+use XML::Simple; $XML::Simple::PREFERRED_PARSER = "XML::Parser";
 use Mojo::Util qw(decamelize);
 
 sub register {
