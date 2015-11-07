@@ -24,13 +24,6 @@ sub post {
     $ua->add_handler("request_send",  sub { print STDERR join "\n",
 						$self->user, $self->password, '';
 					    return });
-    # $ua->add_handler("response_done", sub { shift->dump; return });
-
-    # print '-' x 80;
-    # print dump $request->headers;
-    # print '-' x 80;
-    # print dump $response->headers;
-    # print '-' x 80;
     if ($response->code eq '401') {
 	foreach my $auth_header ($response->header('WWW-Authenticate')) {
 	    if ($auth_header =~ /^NTLM/) {
@@ -51,13 +44,9 @@ sub _ntlm_authenticate {
     ntlm_password($self->password);
 
     my $auth_value = "NTLM " . ntlm();
-    # ntlm_reset();
     my $request = HTTP::Request->new('POST' , $self->endpoint);
     $request->header('Content-Type' => 'text/xml','Authorization' => $auth_value);
     $request->content($content);
-    # print '-' x 80;
-    # print dump $request->headers;
-    # print '-' x 80;
 
     my $response = $ua->request($request);
     foreach my $auth_header ($response->header('WWW-Authenticate')) {
@@ -72,9 +61,6 @@ sub _ntlm_authenticate {
     $request = HTTP::Request->new('POST' , $self->endpoint);
     $request->header('Content-Type' => 'text/xml','Authorization' => $auth_value);
     $request->content($content);
-    # print '-' x 80;
-    # print dump $request->headers;
-    # print '-' x 80;
 
     
     $response = $ua->request($request);

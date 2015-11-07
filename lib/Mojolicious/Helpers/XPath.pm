@@ -2,7 +2,8 @@ package Morg::Helpers::XPath;
 use base 'Mojolicious::Plugin';
 
 use XML::LibXML;
-
+$XML::Simple::PREFERRED_PARSER = "XML::Parser";
+    
 sub register {
     my ($self, $app) = @_;
     $app->helper(xpath => sub { return xpath(@_) });

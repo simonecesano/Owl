@@ -68,7 +68,6 @@ any '/e/login' => sub {
 	$c->render(template => 'e/login');
     } else {
 	$c->session(expiration => 60 * 60 * 24 * 2);
-	app->log->info($_) for (qw/passwd domain euser url/);
 	$c->session($_ => $c->param($_)) for grep { $c->param($_) || 1} (qw/passwd domain euser url/);
 	$c->redirect_to('/e/calendar');
     }

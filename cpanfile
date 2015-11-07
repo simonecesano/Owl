@@ -14,6 +14,7 @@ requires 'Mojolicious::Plugin::OAuth2';
 requires "Mojo::Pg";
 requires 'Mojolicious::Plugin::BootstrapHelpers';
 
+requires 'XML::Parser';
 requires 'XML::Simple';
 requires 'XML::LibXML';
 requires 'Authen::NTLM';
