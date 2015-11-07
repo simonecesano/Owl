@@ -14,12 +14,39 @@
           <t:FieldURI FieldURI="item:Subject" />
           <t:FieldURI FieldURI="calendar:Start" />
           <t:FieldURI FieldURI="calendar:End" />
+	  <t:FieldURI FieldURI="calendar:Duration" />
+	  <t:FieldURI FieldURI="calendar:Location" />
+	  <t:FieldURI FieldURI="calendar:TimeZone" />
+	  <t:FieldURI FieldURI="calendar:UID" />
+	  <t:FieldURI FieldURI="calendar:LegacyFreeBusyStatus" />
+	  <t:FieldURI FieldURI="calendar:IsAllDayEvent" />
+	  <t:FieldURI FieldURI="item:LastModifiedTime" />
         </t:AdditionalProperties>
       </m:ItemShape>
-      <m:CalendarView MaxEntriesReturned="50" StartDate="2015-08-21T17:30:24.127Z" EndDate="2016-09-20T17:30:24.127Z" />
+      <m:CalendarView
+	  MaxEntriesReturned="10000"
+	  StartDate="<%= $start %>Z"
+          EndDate="<%= $end %>Z" />
+      % if ($start || $end) {
+      <!-- <m:Restriction> -->
+      <!-- 	<t:And> -->
+      <!-- 	  <t:IsGreaterThan> -->
+      <!-- 	    <t:FieldURI FieldURI="calendar:Start" /> -->
+      <!-- 	    <t:FieldURIOrConstant> -->
+      <!-- 	      <t:Constant Value="<%= $start %>Z" /> -->
+      <!-- 	    </t:FieldURIOrConstant> -->
+      <!-- 	  </t:IsGreaterThan> -->
+      <!-- 	  <t:IsLessThan> -->
+      <!-- 	    <t:FieldURI FieldURI="calendar:Start" /> -->
+      <!-- 	    <t:FieldURIOrConstant> -->
+      <!-- 	      <t:Constant Value="<%= $end %>Z" /> -->
+      <!-- 	    </t:FieldURIOrConstant> -->
+      <!-- 	  </t:IsLessThan> -->
+      <!-- 	</t:And> -->
+      <!-- </m:Restriction> -->
+      % }
       <m:ParentFolderIds>
-	<t:FolderId Id="AAMkADFjYjZkZGU0LWNmNmItNGQ4Zi05MTYwLTdiYmI2MjEzYmFhYwAuAAAAAAD6rjBKU2HOQIPedGnOV9WZAQAyz/enT3JNSZihjENeCkrFAAAAIQIOAAA="
-              ChangeKey="AgAAABYAAAANDC1NDnVuQ5V1TMezTkxJAAJzGDeq" />
+        <t:DistinguishedFolderId Id="calendar" />
       </m:ParentFolderIds>
     </m:FindItem>
   </soap:Body>

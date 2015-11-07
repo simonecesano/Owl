@@ -1,0 +1,72 @@
+% layout 'default';
+% title 'Create schedule';
+%= include 'menus/basic';
+%= javascript '/js/underscore-min.js';
+%= javascript '/js/handlebars.min.js';
+%= javascript '/js/calendar.js';
+
+%= javascript '/js/bootstrap-select.js';
+%= stylesheet '/css/bootstrap-select.css';
+
+%= javascript '/js/bootstrap-datepicker.js';
+%= stylesheet '/css/bootstrap-datepicker3.css';
+
+%= javascript 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js';
+
+<script type="text/javascript" src="/js/calendar.js"></script>
+<link rel="stylesheet" href="/css/calendar.css">
+<style>
+  body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+</style>
+<script>
+    $(function(){
+	$('#calendar').hide();
+	$('#submit').prop('disabled', true);
+	$.get('/g/calendars.json',
+	      function(d){
+		  if (typeof d.error !== 'undefined' && d.error.code == 401) { window.location.replace("/g/auth") }
+		  _.each(d.items, function(e){
+		      if (e.accessRole == "owner") {
+			  $('#calendar').append($('<option>' + e.summary + '</option>').attr('value', e.id))
+		      }
+		  });
+		  $('#calendar').selectpicker().show();
+		  $('#calendar').on('change', function(e){
+		      if($(this).val().length > 0) {
+			  $('#submit').prop('disabled', false);
+		      } else {
+			  $('#submit').prop('disabled', true);
+		      }
+		  })
+	      })
+	$('#date_until, #date_from').val(moment().add(7, 'days').format('DD-MM-YYYY')).datepicker({
+	    startDate: moment().format('DD-MM-YYYY'),
+	    format: 'dd-mm-yyyy'
+	    }
+	);
+    })
+</script>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-6 col-xs-offset-2">
+      <h2>Create schedule in Google Calendar</h2>
+      <form class="form" method="POST">
+	<div class="form-group">
+	  <label for="calendar">Target calendar:</label><br />
+	  <select id="calendar" name="calendar" data-style="btn-inverse">
+	    <option value="">Select a calendar...</option>
+	  </select>
+	</div>
+	<div class="form-group">
+	  <label for="freq">schedule:</label>
+	  <textarea name="schedule" id="schedule" class="form-control" rows="6"></textarea>
+	</div>
+	<hr />
+	<button type="submit" id="submit" class="btn btn-primary">Create schedule</button>
+      </form>
+    </div>
+  </div>
+</div>

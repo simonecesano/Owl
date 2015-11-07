@@ -1,0 +1,45 @@
+% layout 'default';
+% title 'Google calendars';
+%= include 'menus/basic';
+%= javascript '/js/handlebars.min.js';
+<style>
+  body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+</style>
+<script>
+  $(function(){
+      $.get(window.location.pathname.replace(/\/$/, "") + '.json',
+	    function(d){
+		if (typeof d.error !== 'undefined' && d.error.code == 401) {
+		    window.location.replace("/g/auth")
+		} else {
+		    var source   = $("#entry-template").html();
+		    var template = Handlebars.compile(source);
+		    $('#content').html(template(d));
+		}
+	    }
+	   )
+  })
+</script>
+<div class="container">
+  <div class="row">
+    <div id="content" class="col-xs-8 col-xs-offset-1">
+    </div>
+  </div>
+</div>
+<script id="entry-template" type="text/x-handlebars-template">
+<h1>Your Google Calendars</h1>
+<table class="table">
+  {{#each items}}
+  <tr>
+    <td><a href="/g/calendars/{{ this.id }}">{{ this.summary }}</a></td>
+    <td>{{ this.accessRole }}</td>
+    <td>Sync</td>
+    <td>View</td>
+  </tr>
+  {{/each}}
+</table>
+</script>
+

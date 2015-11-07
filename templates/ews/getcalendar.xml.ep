@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages" 
+    xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" 
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <t:RequestServerVersion Version="Exchange2007_SP1" />
+  </soap:Header>
+  <soap:Body>
+    <m:GetFolder>
+      <m:FolderShape>
+        <t:BaseShape>IdOnly</t:BaseShape>
+      </m:FolderShape>
+      <m:FolderIds>
+        <t:DistinguishedFolderId Id="calendar" />
+      </m:FolderIds>
+      <m:CalendarView MaxEntriesReturned="10000" StartDate="2015-10-21T17:30:24.127Z" />
+    </m:GetFolder>
+  </soap:Body>
+</soap:Envelope>
