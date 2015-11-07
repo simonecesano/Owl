@@ -4,7 +4,7 @@
 <div class="jumbotron">
   <div class="container">
     <h1>Welcome to Oploo</h1>
-    <img width="33%" style="float:left;margin-right:24px" src="/img/sunstone.png">
+    <img width="33%" style="float:left;margin-right:24px" src="/img/sunstone.jpg">
     <p>Oploo helps you manage your calendar and coordinate across Outlook, Google Calendars and other services.</p>
     <p>You can start with <a href="/e/login">Outlook</a>, or <a href="/g/auth">Google Calendar</a>
     <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
