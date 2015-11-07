@@ -21,9 +21,6 @@ sub post {
     $request->content($content);
     $response = $ua->request($request);
 
-    $ua->add_handler("request_send",  sub { print STDERR join "\n",
-						$self->user, $self->password, '';
-					    return });
     if ($response->code eq '401') {
 	foreach my $auth_header ($response->header('WWW-Authenticate')) {
 	    if ($auth_header =~ /^NTLM/) {
@@ -71,8 +68,3 @@ sub _ntlm_authenticate {
 __PACKAGE__->meta->make_immutable;
 
 1;
-
-__DATA__
-
-TlRMTVNTUAABAAAAB6IAAAgACAAgAAAAAAAAAAgAAABjZXNhbnNpbQ==
-TlRMTVNTUAABAAAAB6IAAAgACAAgAAAAAAAAAAgAAABjZXNhbnNpbQ==
