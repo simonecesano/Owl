@@ -10,14 +10,22 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-6 col-xs-offset-2">
-%= form_for '/e/login' => (method => 'POST') => begin
-%= formgroup 'Base address', text_field => ['url'], large, cols => { small => [3, 9] }
-%= formgroup 'Domain', text_field => ['domain'], large, cols => { small => [3, 9] }
-%= formgroup 'User', text_field => ['euser'], large, cols => { small => [3, 9] }
-%= formgroup 'Password', password_field => ['passwd'], large, cols => { small => [3, 9] }
-%= submit_button 'login'
-% end
-<!-- this is foo -->
-	</div>
-      </div>
+      <h2>Login to Exchange</h2>
+      <form class="form" action="/e/login" method="POST">
+        <div class="form-group">
+          <label for="url">Base address</label>
+          <input class="form-control" id="url" name="url" type="text">
+        </div>
+        <div class="form-group">
+          <label for="euser">User</label>
+          <input class="form-control" id="euser" name="euser" type="text">
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="passwd">Password</label>
+	  <input class="form-control" id="passwd" name="passwd" type="password">
+        </div>
+	<button class="btn btn-default" type="submit">login</button>
+      </form>
+    </div>
+  </div>
  </div>

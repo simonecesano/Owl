@@ -80,6 +80,8 @@ any "/g/auth" => sub {
     $c->delay(
 		 sub {
 		     my $delay = shift;
+		     app->log->info('Referrer: ' . $c->req->headers->referrer);
+		     $c->session('oauth_referrer', $c->req->headers->referrer);
 		     $c->oauth2->get_token('google', $delay->begin );
 		 },
 		 sub {
@@ -87,6 +89,7 @@ any "/g/auth" => sub {
 		     return $c->render(text => $err) unless $token;
 		     $c->session(token => $token);
 		     app->log->info("Token:\n" . dump $token);
+		     app->log->info('Referrer: ' . $c->req->headers->referrer);
 		     $c->redirect_to('/g/calendars');
 		     app->log->info("Token from session:\n" . dump $token);
 		 },
@@ -287,6 +290,7 @@ post '/e/sync' => sub {
 			    actions => $actions,
 			   });
     } else {
+
     }
 };
 
@@ -294,6 +298,7 @@ get '/g/recur' => sub {
     my $c = shift;
     unless ($c->stash('format') =~ /json/i) { return $c->render(template => '/g/recur') };
 };
+
 use Morg::Calendar::Parser;
 
 post '/g/recur' => sub {
