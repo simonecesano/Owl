@@ -1,5 +1,5 @@
 % layout 'default';
-% title 'Exchange calendar';
+% title 'Google calendar';
 %= include 'menus/basic';
 %= javascript '/js/underscore-min.js';
 %= javascript '/js/handlebars.min.js';
@@ -41,6 +41,7 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-6 col-xs-offset-2">
+      <h2>Google calendar</h2>
       <div id="calendar">
       </div>
     </div>

@@ -8,7 +8,7 @@ use Mojo::Util qw(decamelize);
 sub register {
     my ($self, $app) = @_;
     $app->helper(xpath => sub { return xpath(@_) });
-    $app->helper(parse_xml => sub { return to_json(@_) });
+    $app->helper(parse_xml => sub { return to_struct(@_) });
 };
 
 sub xpath {
@@ -25,7 +25,7 @@ sub xpath {
     return $xpc->findnodes($xpath, $xml);
 }
 
-sub to_json {
+sub to_struct {
     my ($c, $xml, $sub) = @_;
     $sub ||= sub {
 	my $h = shift;

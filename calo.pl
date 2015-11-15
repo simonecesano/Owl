@@ -13,17 +13,21 @@ use DateTime;
 use DateTime::Format::ICal;
 use DateTime::Format::Strptime;
 
+use Owl::UserAgent::Google;
+
 use Net::Google::Calendar;
 use XML::Simple; $XML::Simple::PREFERRED_PARSER = "XML::Parser";
 use CHI;
 use Path::Tiny;
 use Morg::UserAgent::LWP::NTLM;
+use Morg::Calendar::Parser;
 
 
 # Documentation browser under "/perldoc"
 plugin 'PODRenderer';
 plugin "bootstrap3";
 plugin 'BootstrapHelpers';
+# plugin 'Renderer::XML';
 plugin 'Morg::Helpers::XPath';
 # plugin 'Morg::Helpers::XMLtoJSON';
     
@@ -59,7 +63,7 @@ plugin 'o_auth2', google => $config->{google};
 
 app->hook(before_dispatch => sub {
 	      my $c = shift;
-	      app->log->info(dump $c->req->url)
+	      # app->log->info(dump $c->req->url)
 	  });
 
 any '/e/login' => sub {
@@ -80,7 +84,6 @@ any "/g/auth" => sub {
     $c->delay(
 		 sub {
 		     my $delay = shift;
-		     app->log->info('Referrer: ' . $c->req->headers->referrer);
 		     $c->session('oauth_referrer', $c->req->headers->referrer);
 		     $c->oauth2->get_token('google', $delay->begin );
 		 },
@@ -88,10 +91,7 @@ any "/g/auth" => sub {
 		     my ($delay, $err, $token) = @_;
 		     return $c->render(text => $err) unless $token;
 		     $c->session(token => $token);
-		     app->log->info("Token:\n" . dump $token);
-		     app->log->info('Referrer: ' . $c->req->headers->referrer);
-		     $c->redirect_to('/g/calendars');
-		     app->log->info("Token from session:\n" . dump $token);
+		     $c->redirect_to($c->req->headers->referrer || '/g/calendars');
 		 },
 		);
 };
@@ -100,9 +100,8 @@ get '/g/calendars' => sub {
     my $c = shift;
     unless ($c->stash('format') =~ /json/i) { return $c->render(template => '/g/calendars') };
 
-    my $ua = Mojo::UserAgent->new;
+    my $ua = Owl::UserAgent::Google->new({ token => $c->session('token')});
     my $tx = $ua->build_tx('GET' => 'https://www.googleapis.com/calendar/v3/users/me/calendarList');
-    $tx->req->headers->authorization('Bearer ' . $c->session('token')->{access_token});
     $tx = $ua->start($tx);
     $c->res->headers->content_type('application/json');
     $c->render(text => $tx->res->body);
@@ -294,12 +293,80 @@ post '/e/sync' => sub {
     }
 };
 
+get '/e/me' => sub {
+    my $c = shift;
+    $c->stash(text => $c->session('euser'));
+    my $soap = $c->render_to_string('ews/names', format => 'xml');;
+    my $url = Mojo::URL->new($c->session('url') . '/ews/exchange.asmx');
+    my $ua = Morg::UserAgent::LWP::NTLM->new(user => $c->session('euser'),
+					    password => $c->session('passwd'),
+					    endpoint => 'https://deher.webmail.adidas-group.com/ews/exchange.asmx');
+    
+    my $response = $ua->post($soap);
+    if ($response->is_success) {
+	$c->res->headers->content_type('text/xml');
+	$c->render(text => $response->decoded_content);
+    } else {
+	$c->render(text => $response->decoded_content);
+    }
+};
+
+use Mojo::Util qw(b64_encode url_escape url_unescape);
+use Owl::Babel::EWS;
+
+use List::MoreUtils qw/mesh natatime/;
+
+any '/e/meet' => sub {
+    my $c = shift;
+
+    unless ($c->stash('format') =~ /json/i) {
+	if ($c->req->params->to_string) {
+	    return $c->render(template => '/e/meet')
+	} else {
+	    return $c->render(template => '/e/meet_form')
+	}
+    };
+
+    app->log->info(dump $c->session('params'));
+    app->log->info($c->session);
+
+    my @people = map { s/^\s+|\s+$//g; $_ } grep { /\w/ } split /\n|\r|\f/, $c->param('people');
+    return $c->render(json => {
+			       error => 'no people selected',
+			       people => $c->param('people')
+			      } ) unless scalar @people;
+    
+    my $start = DateTime->now(time_zone  => 'CET')->set( minute => 0, second => 0);
+    my $end = $start->clone->add( days => ($c->param('interval') || 15) );
+    
+    my $url = Mojo::URL->new('https://deher.webmail.adidas-group.com/public/');
+    my $par = Mojo::Parameters->new;
+    $par->append(Cmd => 'freebusy', start => "$start", end => "$end", interval => 30);
+
+    my @people = map { s/^\s+|\s+$//g; $_ } grep { /\w/ } split /\n|\r|\f/, $c->param('people');
+    for (@people) { $par->append( u => $_ ) };
+
+    $url->query( url_unescape "$par" );
+    $url->userinfo(sprintf('%s\%s:%s', ('emea', $c->session('euser'), $c->session('passwd'))));
+    app->log->info($url);
+    
+    my $ua = Mojo::UserAgent->new;
+    my $res = $ua->get($url)->res;
+    my $data = Owl::Babel::EWS->new($res->content->asset->slurp);
+    $c->render(json => $data->freebusy($start, $end, 30));
+};
+
+
+get '/e/organize' => sub {
+    my $c = shift;
+    $c->render(json => $c->req->params->to_hash());
+};
+
 get '/g/recur' => sub {
     my $c = shift;
     unless ($c->stash('format') =~ /json/i) { return $c->render(template => '/g/recur') };
 };
 
-use Morg::Calendar::Parser;
 
 post '/g/recur' => sub {
     my $c = shift;
@@ -326,6 +393,60 @@ post '/g/quickinput' => sub {
     $c->render(json => { params  => $p, response => $gcal });
 };
 
+get '/g/geocode' => sub {
+    my $c = shift;
+    my $ua = Mojo::UserAgent->new;
+    # https://maps.googleapis.com/maps/api/timezone/json?location=Portland&key='
+    my $tx = $ua->build_tx('GET' => 'https://maps.googleapis.com/maps/api/geocode/json?address=Portland OR' .
+			   'AIzaSyAw_6PO5Il8f4ULbJvc53K1SFlxZvx5fW8');
+    $tx = $ua->start($tx);
+    app->log->info(dump $tx->res);
+    
+    $c->render(json => { response => $tx->res->json });
+};
+
+get '/x/xml' => sub {
+    my $c = shift;
+    app->log->info(ref $c);
+    app->log->info(dump $c->app->renderer->handlers);
+    $c->render( wee => 'bar' );
+};
+
+get '/x/dump' => sub {
+    my $c = shift;
+    $c->res->headers->content_type('text/plain');
+    
+    $c->render(text => dump app->renderer);
+
+};
+
+get '/x/types' => sub {
+    my $c = shift;
+    $c->res->headers->content_type('text/plain');
+    
+    $c->render(text => app->types->type('xml'));
+
+};
+
+get '/e/resolve/#name' => sub {
+    my $c = shift;
+    $c->stash('name', $c->param('name'));
+    my $soap = $c->render_to_string('ews/resolvenames', format => 'xml');;
+    my $url = Mojo::URL->new($c->session('url') . '/ews/exchange.asmx');
+
+    my $ua = Morg::UserAgent::LWP::NTLM->new(user => $c->session('euser'),
+					    password => $c->session('passwd'),
+					    endpoint => 'https://deher.webmail.adidas-group.com/ews/exchange.asmx');
+    
+    my $res = $ua->post($soap);
+    if ($res->is_success) {
+	my $data = Owl::Babel::EWS->new($res->decoded_content);
+	$c->render(json => $data->data('//*/t:EmailAddress'));
+    } else {
+	$c->render(text => $res->decoded_content);
+    }
+    
+};
 
 app->start;
 

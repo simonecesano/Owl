@@ -61,7 +61,7 @@
 	  </select>
 	</div>
 	<div class="form-group col-xs-6" style="padding-left:0">
-	  <label for="date_until">valid from:</label><br />
+	  <label for="date_from">valid from:</label><br />
 	  <div class="input-group date">
 	    <input type="text" name="date_from" id="date_from" class="form-control">
             <div class="input-group-addon"><span class="glyphicon glyphicon-th"></span></div>

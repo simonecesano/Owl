@@ -1,6 +1,6 @@
 % layout 'default';
 % title 'Exchange calendar';
-%= include 'menus/basic';
+%= include 'menus/e';
 %= javascript '/js/underscore-min.js';
 %= javascript '/js/handlebars.min.js';
 %= javascript '/js/calendar.js';
@@ -38,6 +38,7 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-6 col-xs-offset-2">
+      <h2>Exchange calendar</h2>
       <div id="calendar">
       </div>
     </div>

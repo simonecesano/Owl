@@ -13,7 +13,7 @@
       $.get(window.location.pathname.replace(/\/$/, "") + '.json',
 	    function(d){
 		if (typeof d.error !== 'undefined' && d.error.code == 401) {
-		    window.location.replace("/g/auth")
+		    window.location.assign("/g/auth")
 		} else {
 		    var source   = $("#entry-template").html();
 		    var template = Handlebars.compile(source);
