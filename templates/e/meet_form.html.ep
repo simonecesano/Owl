@@ -1,0 +1,53 @@
+% layout 'default';
+% title 'Organize a meeting';
+%= include 'menus/e';
+%= javascript '/js/underscore-min.js';
+%= javascript '/js/handlebars.min.js';
+%= javascript '/js/bootstrap-datepicker.js';
+%= stylesheet '/css/bootstrap-datepicker3.css';
+ %= javascript 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js';
+<style>
+  body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+</style>
+<script>
+    $(function(){
+	$('#date_until, #date_from').datepicker({
+	    startDate: moment().format('DD-MM-YYYY'),
+	    format: 'dd-mm-yyyy'
+	})
+    })
+</script>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-6 col-xs-offset-2">
+      <h2>Organize a meeting</h2>
+      <form class="form" method="GET">
+	<div class="form-group col-xs-6" style="padding-left:0">
+	  <label for="date_from">search from:</label><br />
+	  <div class="input-group date">
+	    <input type="text" name="date_from" id="date_from" class="form-control">
+            <div class="input-group-addon"><span class="glyphicon glyphicon-th"></span></div>
+	  </div>
+	</div>
+	<div class="form-group col-xs-6" style="padding-left:0">
+	  <label for="date_until">search until:</label><br />
+	  <div class="input-group date">
+	    <input type="text" name="date_until" id="date_until" class="form-control">
+            <div class="input-group-addon"><span class="glyphicon glyphicon-th"></span></div>
+	  </div>
+	</div>
+	<div class="form-group col-xs-12" style="padding-left:0">
+	  <label for="people">People:</label><br />
+	  <textarea id="people" name="people" class="form-control" rows="12"></textarea>
+	</div>
+	<div class="checkbox">
+	  <label><input name="include_me" type="checkbox" checked>Include myself</label>
+	</div>
+	<hr />
+	<button type="submit" id="submit" class="btn btn-primary">Search calendars</button>
+    </div>
+  </div>
+</div>

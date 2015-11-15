@@ -1,0 +1,154 @@
+% layout 'default';
+%= javascript 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js'
+%= include 'menus/basic';
+<!-- freebusy.html.ep -->
+<script>
+var greens = ['white', 'rgb(247,252,245)','rgb(229,245,224)','rgb(199,233,192)','rgb(161,217,155)',
+		  'rgb(116,196,118)','rgb(65,171,93)','rgb(35,139,69)','rgb(0,109,44)','rgb(0,68,27)'].reverse();
+
+var busy = ['white', 'rgb(254,204,92)','rgb(253,141,60)','rgb(240,59,32)','rgb(189,0,38)'];
+$(function(){
+    [0, 1, 2, 3].forEach(function(e, i){
+	$( "td.avail:contains('" + e + "')" ).css( "background-color", busy[e] );
+    })
+    
+    $( "td.avail:contains('0')" ).css('border-right', 'solid thin #dddddd');
+    $( "td.avail:empty" ).css( "background-color", "white" ).css('border-right', 'solid thin #dddddd');
+    $( "td.avail" ).text( "" );
+    $( ".perc" ).text( "" );
+    $('.perc').each(function(i){
+	$(this).css("background-color", greens[Math.floor(10 - $(this).data('perc') / 10)]);
+    });
+
+    function clean_repeats {
+	$('.hour').each(function(i){
+	    console.log($(this).data('hour'));
+	    if (moment($(this).data('hour')).isValid()) {
+		var t = moment($(this).data('hour'));
+		var p = moment($(this).prevAll(":visible:first").data('hour'));
+		console.log($(this).prevAll(":visible:first"));
+		if (t.date() !== p.date()) {
+		    $(this).html(t.format('hh:mm DD-MMM ddd'))
+		} else {
+		    $(this).html(t.format('hh:mm'))
+		}
+		if (t.week() !== p.week()) {
+		}
+	    }
+	});
+    };
+
+    clean_repeats();
+    
+    $('#levels *').on('click', function(){
+	var t = parseInt($(this).find('input').first().data('perc'), 10);
+	$('td').show();
+	$('td.perc').filter(function(e){ return parseInt($(this).data('perc'), 10) < t})
+	    .map(function(e, i){
+		var d = $(this).index();
+		if (d > 0) { $('td:nth-child(' + (d + 1) + ')').hide() }
+	    })
+	if ($('td.perc:visible').size() == 1) {
+	    $('td').show()
+	    $('#noone').fadeIn().fadeOut(1000)
+	}
+	clean_repeats();
+    })
+})
+</script>
+<style>
+div#tablediv {
+        width: 100%;
+        overflow-x:scroll;  
+        margin-left:12em;
+        overflow-y:visible;
+        padding-bottom:1px;
+    }
+
+table
+{
+    table-layout: fixed;
+    width: 100%;
+}
+td {
+    width: 2em;
+    height:2em;
+    text-align: right;
+    border: thin solid white
+}
+td.hour { border-right: thin solid #dddddd }
+
+
+td:first-child {
+     width: 12em;
+     text-align: right;
+     position:absolute;
+     left:0;
+     top:auto;
+     border-right: 0px solid black;
+    }
+
+
+tr:first-child td.hour {
+  height: 240px;
+  white-space: nowrap;
+  /* transform-origin: left top 0; */
+  transform: rotate(90deg);
+  -moz-transform: rotate(90deg);  /* FF3.5+ */
+  -o-transform: rotate(90deg);  /* Opera 10.5 */
+  -webkit-transform: rotate(90deg);  /* Saf3.1+, Chrome */
+  } 
+</style>
+<div class="col-lg-26 col-xs-offset-1"><h1 class="page-header">Who's free</h1></div>
+<div class="col-lg-26 col-xs-offset-2">
+<div id="tablediv">
+  <table id="fb">
+    % my @perc = @{pop @{$fb}};
+    <tr>
+      % my @p = @perc;
+      % for my $t ( @{shift @{$fb}} ) {
+      <td data-perc="<%= shift @p %>" class="hour" data-hour="<%= $t %>"><%= $t %></td>
+      % }
+    </tr>
+    <tr>
+      % my @p = @perc;
+      % for my $t ( @perc ) {
+      <td class="perc" data-perc="<%= $t %>"><%= $t %></td>
+      % }
+    </tr>
+    % for my $row ( @{$fb} ) {
+    % my @p = @perc;
+    <tr>
+      <td data-perc="<%= shift @p %>" data-status=""><%= shift @{$row} %></td>
+      % for my $t ( @{$row} ) {
+      <td class="avail" data-perc="<%= shift @p %>" data-status="<%= $t %>"><%= $t %></td>
+      % }
+    </tr>
+    % }
+  </table>
+</div>
+<div class="col-lg-24">
+  <hr />
+  <div class="form-group">
+    availability:<p />
+    <div class="btn-group" id="levels" data-toggle="buttons">
+      <label class="btn btn-primary">
+	<input type="radio" data-perc="100" name="perc_all" id="option1" autocomplete="off">100%
+      </label>
+      <label class="btn btn-primary">
+	<input type="radio" data-perc="75" name="perc_75" id="option2" autocomplete="off">75%
+      </label>
+      <label class="btn btn-primary">
+	<input type="radio" data-perc="50" name="perc_50" id="option3" autocomplete="off">50%
+      </label>
+      <label class="btn btn-primary">
+	<input type="radio" data-perc="0" name="perc_0" id="option4" autocomplete="off">Any
+      </label>
+    </div>
+  </div>
+  <div id="noone" class="alert alert-info alert-dismissible collapse" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Sorry!</strong> there is no time where everyone is available
+  </div>
+</div>
+</div>
