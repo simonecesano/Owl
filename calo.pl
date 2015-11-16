@@ -451,7 +451,7 @@ get '/e/email/#name' => sub {
 };
 
 use Mojo::Util qw(b64_encode url_escape url_unescape);
-use Convert::Base32;;
+
 get '/e/resolve/#name' => sub {
     my $c = shift;
     $c->stash('name', $c->param('name'));
