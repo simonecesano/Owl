@@ -56,7 +56,7 @@
 		  console.log(l);
 		  $('#list').html(template(l));
 		  $('#list td.bar, #list td.hour, #list td.availability').on('click', function(){
-		      var p = jQuery.param({ 'slot': $(this).data('slot'), 'people': l.people });
+		      var p = jQuery.param({ 'slot': $(this).parent().data('slot'), 'people': l.people });
 		      window.location.assign('/e/organize?' + p)
 		  })
 		  $('td.detail').on('click', function(){

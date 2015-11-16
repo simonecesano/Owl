@@ -428,6 +428,30 @@ get '/x/types' => sub {
 
 };
 
+use List::MoreUtils qw/uniq/;
+
+get '/e/email/#name' => sub {
+    my $c = shift;
+    $c->stash('name', $c->param('name'));
+    my $soap = $c->render_to_string('ews/resolvenames', format => 'xml');;
+    my $url = Mojo::URL->new($c->session('url') . '/ews/exchange.asmx');
+
+    my $ua = Morg::UserAgent::LWP::NTLM->new(user => $c->session('euser'),
+					    password => $c->session('passwd'),
+					    endpoint => 'https://deher.webmail.adidas-group.com/ews/exchange.asmx');
+    
+    my $res = $ua->post($soap);
+    if ($res->is_success) {
+	my $data = Owl::Babel::EWS->new($res->decoded_content);
+	$c->render(json => [ uniq @{$data->data('//*/t:EmailAddress')} ]);
+    } else {
+	$c->render(text => $res->decoded_content);
+    }
+    
+};
+
+use Mojo::Util qw(b64_encode url_escape url_unescape);
+use Convert::Base32;;
 get '/e/resolve/#name' => sub {
     my $c = shift;
     $c->stash('name', $c->param('name'));
@@ -441,11 +465,11 @@ get '/e/resolve/#name' => sub {
     my $res = $ua->post($soap);
     if ($res->is_success) {
 	my $data = Owl::Babel::EWS->new($res->decoded_content);
-	$c->render(json => $data->data('//*/t:EmailAddress'));
+	# $c->render(json => { map { ref $_ ? $_->{entry} : encode_base32($_) } @{$data->data('//*/t:PhysicalAddresses|//*/t:DisplayName')} });
+	$c->render(json => $data->data('//*/m:ResolutionSet'));
     } else {
 	$c->render(text => $res->decoded_content);
     }
-    
 };
 
 app->start;

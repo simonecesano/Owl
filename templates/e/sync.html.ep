@@ -1,6 +1,6 @@
 % layout 'default';
 % title 'Exchange calendar';
-%= include 'menus/basic';
+%= include 'menus/e';
 %= javascript '/js/underscore-min.js';
 %= javascript '/js/handlebars.min.js';
 %= javascript '/js/calendar.js';
