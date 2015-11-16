@@ -14,9 +14,6 @@
 </style>
 <script>
     $(function(){
-	$('#hour').on('click', function(){
-	    console.log('this');
-	});
 	Swag.registerHelpers();
 	$.get(window.location.pathname.replace(/\/$/, "") + '.json' + window.location.search,
 	      function(d){
@@ -52,9 +49,10 @@
 		      e.hour = h;
 		  });
 		  l.initials = _.map(l.people, function(e){ return e.replace(/[^A-Z]/g, '') });
+
 		  var template = Handlebars.compile($("#list-template").html());
-		  console.log(l);
 		  $('#list').html(template(l));
+
 		  $('#list td.bar, #list td.hour, #list td.availability').on('click', function(){
 		      var p = jQuery.param({ 'slot': $(this).parent().data('slot'), 'people': l.people });
 		      window.location.assign('/e/organize?' + p)
