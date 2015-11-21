@@ -6,7 +6,10 @@
 %= javascript '/js/defiant.min.js';
 %= javascript '/js/bootstrap-datepicker.js';
 %= stylesheet '/css/bootstrap-datepicker3.css';
- %= javascript 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js';
+%= javascript 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js';
+%= javascript '/js/bootstrap-tagsinput.js';
+%= stylesheet '/css/bootstrap-tagsinput.css';
+
 <style>
   body {
   padding-top: 50px;
@@ -15,6 +18,8 @@
 </style>
 <script>
     $(function(){
+	
+	
 	$('#date_from').val(moment().format('DD-MM-YYYY'));
 	$('#date_until').val(moment().add(2, 'weeks').format('DD-MM-YYYY'));
 	$('#date_until, #date_from').datepicker({
@@ -56,15 +61,15 @@
 	  </div>
 	</div>
 	<div class="form-group col-xs-12" style="padding-left:0">
-	  <label for="people">People:</label>
-	  <textarea id="people" name="people" class="form-control" rows="12"></textarea>
+	  <label for="attendees">People:</label><br />
+	  <textarea data-role="tagsinput" id="people" name="people" class="form-control" rows="12"></textarea>
 	</div>
 	<div class="checkbox">
 	  <label><input name="include_me" type="checkbox" checked>Include myself</label>
 	</div>
 	<hr />
 	<span id="check_names" class="btn btn-primary">Check names</span>
-	<button type="submit" id="submit" class="btn btn-primary">Search calendars</button>
+	<span id="submit" class="btn btn-primary">Search calendars</span>
     </div>
   </div>
 </div>

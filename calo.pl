@@ -323,7 +323,7 @@ any '/e/meet' => sub {
 	if ($c->req->params->to_string) {
 	    return $c->render(template => '/e/meet')
 	} else {
-	    return $c->render(template => '/e/meet_form')
+	    return $c->render(template => '/e/meet_tags')
 	}
     };
 
@@ -359,7 +359,7 @@ any '/e/meet' => sub {
 
 get '/e/organize' => sub {
     my $c = shift;
-    $c->render(json => $c->req->params->to_hash());
+    $c->render(template => '/e/setup');
 };
 
 get '/g/recur' => sub {

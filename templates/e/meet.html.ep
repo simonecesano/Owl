@@ -106,7 +106,7 @@ tr.detail {
 	       >{{ this.availability }}</div>
 	</td>
       </tr>
-      <tr class="detail">
+      <tr data-slot="{{ this.slot }}" class="detail">
 	<td class="availability" colspan="3">
 	  <div><b>Available:</b><br/>
 	    {{#each this.freebusy }}
