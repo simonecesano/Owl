@@ -54,8 +54,7 @@
 		  $('#list').html(template(l));
 
 		  $('#list td.bar, #list td.hour, #list td.availability').on('click', function(){
-		      var p = jQuery.param({ 'slot': $(this).parent().data('slot'), 'people': l.people });
-		      window.location.assign('/e/organize?' + p)
+		      window.location.assign(window.location + '/organize/' + $(this).parent().data('slot'))
 		  })
 		  $('td.detail').on('click', function(){
 		      $(this).parent().next().toggle();
@@ -107,7 +106,7 @@ tr.detail {
 	</td>
       </tr>
       <tr data-slot="{{ this.slot }}" class="detail">
-	<td class="availability" colspan="3">
+	<td class="availability" colspan="2">
 	  <div><b>Available:</b><br/>
 	    {{#each this.freebusy }}
 	    {{#unless this.status }}
@@ -122,6 +121,13 @@ tr.detail {
 	    {{/if}}
 	    {{/each}}
 	  </div>
+	</td>
+	<td>
+	  Actions:
+	  <ul>
+	    <li><a href="organize">organize</a></li>
+	    <li>mail</li>
+	  </ul>
 	</td>
       </tr>
       {{/each}}

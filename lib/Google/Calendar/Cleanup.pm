@@ -272,7 +272,15 @@ sub from_ews {
     my $e = clone(shift);
 
     $e->{time_zone} = $WinToOlson{$e->{time_zone}} if $WinToOlson{$e->{time_zone}};
-    $e->{time_zone} ||= 'UTC'; $e->{time_zone} = ref $e->{time_zone} ? 'UTC' : $e->{time_zone};
+    if ($e->{time_zone} =~ /\(UTC(.+?)\)/) {
+	local $\ = "\n";
+	print STDERR "-" x 80;
+	dump $e->{time_zone};
+	$e->{time_zone} = DateTime::TimeZone->new( name => $1 );
+	print STDERR "-" x 80;
+    }
+    $e->{time_zone} ||= 'UTC';
+    # $e->{time_zone} = ref $e->{time_zone} ? 'UTC' : $e->{time_zone};
     my $g = {
 	     'summary' =>  $e->{subject},
 	     'start' =>  { 'dateTime' =>  $e->{start}, 'timeZone' => $e->{time_zone} },
@@ -301,3 +309,8 @@ sub from_ews {
 
 
 1;
+__DATA__
+
+service734100@dak.de
+
+    L564 514 678

@@ -6,6 +6,12 @@ has 'token';
 
 # check http://mojolicio.us/perldoc/Mojo/UserAgent#start
 
+# sub new {
+#     my $self = shift;
+
+#     return $self->SUPER::new;
+# }
+
 sub build_tx {
     my $self = shift;
     if ($self->token) {
