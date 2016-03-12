@@ -27,7 +27,6 @@ use Morg::Calendar::Parser;
 plugin 'PODRenderer';
 plugin "bootstrap3";
 plugin 'BootstrapHelpers';
-
 plugin 'Morg::Helpers::XPath';
     
 my $ua = Mojo::UserAgent->new;
