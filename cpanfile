@@ -9,6 +9,9 @@ requires 'Path::Tiny';
 requires 'Try::Tiny';
 requires 'List::AllUtils';
 
+requires 'Plack::App::Proxy';
+requires 'Plack::App::File';
+
 requires "Mojolicious";
 requires 'Mojolicious::Plugin::OAuth2', '1.53';
 requires "Mojo::Pg";
