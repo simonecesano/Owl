@@ -27,7 +27,7 @@ use Morg::Calendar::Parser;
 plugin 'PODRenderer';
 plugin "bootstrap3";
 plugin 'BootstrapHelpers';
-plugin 'RenderFile';
+# plugin 'RenderFile';
 
 plugin 'Morg::Helpers::XPath';
     

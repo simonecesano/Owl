@@ -13,7 +13,6 @@ requires "Mojolicious";
 requires 'Mojolicious::Plugin::OAuth2', '1.53';
 requires "Mojo::Pg";
 requires 'Mojolicious::Plugin::BootstrapHelpers';
-requires 'Mojolicious::Plugin::RenderFile ';
 
 requires 'XML::NamespaceSupport', '1.11';
 requires 'XML::Parser';
