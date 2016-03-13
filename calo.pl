@@ -34,8 +34,8 @@ my $ua = Mojo::UserAgent->new;
 
 my $cal;
 
-plugin Mount => {'/g' => './gcal/g.pl'};
-plugin Mount => {'/e' => './ews/e.pl'};
+# plugin Mount => {'/g' => './gcal/g.pl'};
+# plugin Mount => {'/e' => './ews/e.pl'};
 
 app->secrets(['Oploo rocks']);
 push @{app->routes->namespaces}, 'Blogs';
