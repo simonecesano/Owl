@@ -180,10 +180,6 @@ my %WinToOlson =
         'US Eastern Standard Time'        => 'America/Indianapolis',
         'US Mountain'                     => 'America/Phoenix',
         'US Mountain Standard Time'       => 'America/Phoenix',
-        'UTC'                             => 'UTC',
-        'UTC+12'                          => '+1200',
-        'UTC-02'                          => '-0200',
-        'UTC-11'                          => '-1100',
         'Venezuela Standard Time'         => 'America/Caracas',
         'Vladivostok'                     => 'Asia/Vladivostok',
         'Vladivostok Standard Time'       => 'Asia/Vladivostok',
@@ -244,23 +240,29 @@ sub flatten_recurrences {
     return $self;
 }
 
+use Mojo::JSON qw(decode_json encode_json);
+use Path::Tiny;
+
 sub sync_actions {
     my $self = shift;
     my $gcal = $self->data->{items};
     my $ecal = shift->{items};
 
+    path("ecal.json")->spew(encode_json($ecal));
+    path("gcal.json")->spew(encode_json($gcal));
+    
     my $i;
     # my $ecal_idx = { map { $_->{u_i_d} => $i++ } @{$ecal}};
     my $gcal_idx = { map { $_->{extendedProperties}->{private}->{ews_id} => $_->{id} } grep { eval { $_->{extendedProperties}->{private}->{ews_id} } } @{$gcal} };
 
     # sets are all EWS id's 
-    my $ecal_set = Set::Scalar->new(map { $_->{u_i_d} } @{$ecal});
+    my $ecal_set = Set::Scalar->new(map { $_->{item_id}->{Id} } @{$ecal});
     my $gcal_set = Set::Scalar->new(grep { $_ } map { eval { $_->{extendedProperties}->{private}->{ews_id} } } @{$gcal});
 
     return {
-	    delete_items => [ @{$gcal_idx}{@{$gcal_set->difference($ecal_set)}} ],   # ids of google items to be deleted
+	    delete_items => [ @{$gcal_idx}{@{$gcal_set->difference($ecal_set)}} ],                   # ids of google items to be deleted
 	    update_items => { map { $_ => $gcal_idx->{$_} } @{$gcal_set->intersection($ecal_set)} }, # hash of items to update indexed by google id
-	    add_items    => [ @{$ecal_set->difference($gcal_set)} ],                 # list of items to be added by ews id
+	    add_items    => [ @{$ecal_set->difference($gcal_set)} ],                                 # list of items to be added by ews id
 	   }
 }
 
@@ -269,18 +271,27 @@ use DateTime::Format::Strptime;
 
 sub from_ews {
     my $class = shift;
-    my $e = clone(shift);
 
-    $e->{time_zone} = $WinToOlson{$e->{time_zone}} if $WinToOlson{$e->{time_zone}};
-    if ($e->{time_zone} =~ /\(UTC(.+?)\)/) {
-	local $\ = "\n";
-	print STDERR "-" x 80;
-	dump $e->{time_zone};
-	$e->{time_zone} = DateTime::TimeZone->new( name => $1 );
-	print STDERR "-" x 80;
-    }
-    $e->{time_zone} ||= 'UTC';
+    my $e = clone(shift);
+    
+    # print $e->{time_zone};
+    
+
+    # if ($WinToOlson{$e->{time_zone}}) {
+    # 	$e->{time_zone} = $WinToOlson{$e->{time_zone}} if $WinToOlson{$e->{time_zone}};
+    # } elsif ($e->{time_zone} =~ /\(UTC(.+?)\)/) {
+    # 	local $\ = "\n";
+    # 	print STDERR "-" x 20 . 'TIMEZONE' . "-" x 20;
+    # 	$e->{time_zone} = DateTime::TimeZone->new( name => $1 );
+    # 	print dump $e->{time_zone};
+    # 	print $e->{time_zone};
+    # 	print STDERR "-" x 80;
+    # 	$e->{time_zone} ||= 'UTC';
+    # } else {
+    # 	$e->{time_zone} = 'Europe/Berlin';
+    # }
     # $e->{time_zone} = ref $e->{time_zone} ? 'UTC' : $e->{time_zone};
+    $e->{time_zone} = 'Europe/Berlin';
     my $g = {
 	     'summary' =>  $e->{subject},
 	     'start' =>  { 'dateTime' =>  $e->{start}, 'timeZone' => $e->{time_zone} },
@@ -288,15 +299,16 @@ sub from_ews {
 	     'extendedProperties' => {
 				      private => { 
 						  ews_change_key =>  $e->{item_id}->{ChangeKey},
-						  ews_id => $e->{u_i_d}
+						  ews_id => $e->{item_id}->{Id}
 						 },
 				     }
 	    };
     $g->{transparency} = "transparent" if $e->{legacy_free_busy_status} =~ /free/i;
+
     if ($e->{is_all_day_event} =~ /true/i) {
 	my $strp = DateTime::Format::Strptime->new( pattern => '%FT%T%Z', locale => 'en_US');
 	$g->{start}->{date} = $strp->parse_datetime(delete $g->{start}->{dateTime});
-	dump $e->{time_zone}; 
+	# print dump $e->{time_zone}; 
 	$g->{start}->{date}->set_time_zone($e->{time_zone});
 	$g->{start}->{date} = $g->{start}->{date}->strftime('%F');
 
@@ -309,8 +321,5 @@ sub from_ews {
 
 
 1;
+
 __DATA__
-
-service734100@dak.de
-
-    L564 514 678
