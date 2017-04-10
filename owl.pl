@@ -45,6 +45,7 @@ any '/login' => sub {
 						 endpoint => $c->param('url'));
 
 	my $response = $ua->post($soap);
+	app->log->info($response->decoded_content);
 	if ($response->is_success) {
 	    my $xml = Mojo::DOM->new($response->decoded_content);
 
