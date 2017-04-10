@@ -1,0 +1,31 @@
+% layout 'default';
+% title 'Login via Exchange';
+%= include 'menus/basic';
+<style>
+  body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+</style>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-6 col-xs-offset-2">
+      <h2>Login to Exchange</h2>
+      <form class="form" action="/login" method="POST">
+        <div class="form-group">
+          <label for="user">User</label>
+          <input class="form-control" id="user" name="user" type="text">
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="passwd">Password</label>
+	  <input class="form-control" id="passwd" name="passwd" type="password">
+        </div>
+        <div class="form-group">
+          <label for="url">Base address</label>
+          <input class="form-control" id="url" name="url" type="text">
+        </div>
+	<button class="btn btn-default" type="submit">login</button>
+      </form>
+    </div>
+  </div>
+ </div>

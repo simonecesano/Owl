@@ -1,0 +1,31 @@
+% layout 'default';
+%= include 'menus/basic';
+<style>
+  body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+</style>
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-6 col-xs-offset-2">
+      <h3>Exchange</h3>
+      <table class="table">
+	<tbody>
+	  % for my $k (qw/ews_email_address ews_given_name ews_url ews_user ews_calendar_last_read/) {
+	  <tr><td><%= $k %></td><td><%= $c->session->{$k} %></td></tr>
+	  % }
+	</tbody>
+      </table>
+      <h3>Google</h3>
+      <table class="table">
+	<tbody>
+	  % for my $k (qw/google_email google_given_name google_calendar_name google_calendar_id google_calendar_last_updated/) {
+	  <tr><td><%= $k %></td><td><%= $c->session($k) %></td></tr>
+	  % }
+	</tbody>
+      </table>
+    </div>
+  </div>
+</div>
