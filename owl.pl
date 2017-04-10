@@ -38,25 +38,21 @@ any '/login' => sub {
 	$c->session(expiration => 60 * 60 * 24 * 2);
 	$c->stash(name => $c->param('user'));
 	my $soap = $c->render_to_string('ews/resolvenames', format => 'xml');
-	app->log->info($soap);
 
 	my $ua = Morg::UserAgent::LWP::NTLM->new(user     => $c->param('user'),
 						 password => $c->param('passwd'),
 						 endpoint => $c->param('url'));
 
 	my $response = $ua->post($soap);
-	app->log->info($response->decoded_content);
 	if ($response->is_success) {
 	    my $xml = Mojo::DOM->new($response->decoded_content);
 
 	    for (qw/EmailAddress GivenName/) {
-		app->log->info(decamelize($_));
 		$c->session('ews_' . decamelize($_), $xml->at($_)->text) if $xml->at($_)
 	    }
 	    
 	    for (grep { $c->param($_) || 1} (qw/passwd user url/)) {
 		$c->session('ews_' . $_ => $c->param($_));
-		app->log->info($_)
 	    }
 	    $c->redirect_to('/me');
 	} else {
@@ -118,7 +114,8 @@ post '/sync' => sub {
     for my $item (@{$gcal->{items}}) {
     	my $tx = $ua->build_tx('DELETE' => 'https://www.googleapis.com/calendar/v3/calendars/' . $calendar . '/events/' . $item->{id});
     	$tx->req->headers->authorization('Bearer ' . $c->session('token')->{access_token});
-	$tx = $ua->start($tx, sub { app->log->info($item->{summary}) });
+	$tx = $ua->start($tx);
+	#, sub { app->log->info($item->{summary}) });
     }
     
     my $soap = $c->render_to_string('ews/findappointments', format => 'xml');;
@@ -138,7 +135,8 @@ post '/sync' => sub {
 	    my $tx = $ua->build_tx('POST' => 'https://www.googleapis.com/calendar/v3/calendars/' . $calendar . '/events', json => $item);
 	    try { 
 		$tx->req->headers->authorization('Bearer ' . $c->session('token')->{access_token});
-		$tx = $ua->start($tx, sub { app->log->info($item->{summary}) });
+		$tx = $ua->start($tx); #, sub { app->log->info($item->{summary}) });
+		app->log->info($item->{summary})
 	    } catch {
 		app->log->info('error');
 		app->log->info(dump $tx->res->json);
@@ -173,7 +171,6 @@ get '/calendars' => sub {
     my $default = $c->session('google_calendar_id');
     for (grep { $_->{id} eq $default } @{$cals->{items}}) { $_->{default} = 1 }
     
-    app->log->info(dump $cals);
     $c->render(json => $cals);
 }; 
 
