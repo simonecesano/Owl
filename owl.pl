@@ -110,13 +110,16 @@ post '/sync' => sub {
     $c->session('google_calendar_name', $gcal->{summary});
     $c->session('google_calendar_id', $calendar);
     $c->session('google_calendar_last_updated', DateTime->now);
-    
+
+    app->log->info(sprintf("Deleting %d items", scalar @{$gcal->{items}}));
+    my $i;
     for my $item (@{$gcal->{items}}) {
     	my $tx = $ua->build_tx('DELETE' => 'https://www.googleapis.com/calendar/v3/calendars/' . $calendar . '/events/' . $item->{id});
     	$tx->req->headers->authorization('Bearer ' . $c->session('token')->{access_token});
 	$tx = $ua->start($tx);
-	#, sub { app->log->info($item->{summary}) });
+	$i++;
     }
+    app->log->info(sprintf("Deleted %d items", $i));
     
     my $soap = $c->render_to_string('ews/findappointments', format => 'xml');;
     my $ua = Morg::UserAgent::LWP::NTLM->new(user => $c->session('ews_user'),
